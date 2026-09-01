@@ -8,24 +8,37 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 const resend = new Resend(process.env.RESEND_API_KEY as string)
 
 export async function POST(req: NextRequest) {
-  const event = await stripe.webhooks.constructEvent(
-    await req.text(),
-    req.headers.get("stripe-signature") as string,
-    process.env.STRIPE_WEBHOOK_SECRET as string
-  )
+  let event: Stripe.Event
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      await req.text(),
+      req.headers.get("stripe-signature") as string,
+      process.env.STRIPE_WEBHOOK_SECRET as string
+    )
+  } catch (err: any) {
+    console.error("WEBHOOK ERROR:", err.message)
+    return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 })
+  }
 
   if (event.type === "charge.succeeded") {
-    const charge = event.data.object
-    const productId = charge.metadata.productId
-    const email = charge.billing_details.email
+    const charge = event.data.object as Stripe.Charge
+
+    const rawEmail = charge.metadata?.email || charge.billing_details?.email
+    const email = rawEmail?.toLowerCase().trim()
+    const productId = charge.metadata?.productId
     const pricePaidInCents = charge.amount
+
+    if (!productId || !email) {
+      return new NextResponse("Bad Request: Missing productId or email", { status: 400 })
+    }
 
     const product = await db.product.findUnique({
       where: { id: productId },
     })
 
-    if (product == null || email == null) {
-      return new NextResponse("Bad Request", { status: 400 })
+    if (product == null) {
+      return new NextResponse("Bad Request: Product not found", { status: 400 })
     }
 
     const userObject = {
@@ -52,18 +65,20 @@ export async function POST(req: NextRequest) {
         from: `Support <onboarding@resend.dev>`,
         to: email,
         subject: "Order Confirmation",
-        react: <PurchaseReceiptEmail
-          product={product}
-          order={order}
-          downloadVerificationId={downloadVerification.id}
-        />,
+        react: (
+          <PurchaseReceiptEmail
+            product={product}
+            order={order}
+            downloadVerificationId={downloadVerification.id}
+          />
+        ),
       })
       console.log("RESEND SUCCESS:", emailResult)
     } catch (error) {
       console.error("RESEND ERROR:", error)
     }
 
-    return new NextResponse()
+    return new NextResponse("Order Processed", { status: 200 })
   }
 
   return new NextResponse(null, { status: 200 })
