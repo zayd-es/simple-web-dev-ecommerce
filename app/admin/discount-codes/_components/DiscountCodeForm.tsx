@@ -15,10 +15,12 @@ export function DiscountCodeForm({
 }: {
   products: { name: string; id: string }[]
 }) {
-  const [error, action] = useActionState(addDiscountCode, {})
+  const [data, action] = useActionState(addDiscountCode as any, {} as any)
+  const error = data
+
   const [allProducts, setAllProducts] = useState(true)
-  const today=new Date()
-  today.setMinutes(today.getMinutes()-today.getTimezoneOffset())
+  const today = new Date()
+  today.setMinutes(today.getMinutes() - today.getTimezoneOffset())
 
   return (
     <form action={action} className="space-y-8">
