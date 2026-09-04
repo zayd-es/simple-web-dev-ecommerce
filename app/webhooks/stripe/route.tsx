@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
     const charge = event.data.object as Stripe.Charge
 
     const rawEmail = charge.metadata?.email || charge.billing_details?.email
+    const discountCodeId = charge.metadata?.discountCodeId || null
     const email = rawEmail?.toLowerCase().trim()
     const productId = charge.metadata?.productId
     const pricePaidInCents = charge.amount
@@ -41,15 +42,21 @@ export async function POST(req: NextRequest) {
       return new NextResponse("Bad Request: Product not found", { status: 400 })
     }
 
-    const userObject = {
-      email,
-      orders: { create: { productId, pricePaidInCents } },
+    const orderData = {
+      productId,
+      pricePaidInCents,
+      discountCodeId: discountCodeId || undefined,
     }
 
     const { orders: [order] } = await db.user.upsert({
       where: { email },
-      create: userObject,
-      update: { orders: { create: { productId, pricePaidInCents } } },
+      create: {
+        email,
+        orders: { create: orderData },
+      },
+      update: {
+        orders: { create: orderData },
+      },
       select: { orders: { orderBy: { createdAt: "desc" }, take: 1 } },
     })
 
@@ -59,6 +66,13 @@ export async function POST(req: NextRequest) {
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
       },
     })
+
+    if (discountCodeId != null) {
+      await db.discountCode.update({
+        where: { id: discountCodeId },
+        data: { uses: { increment: 1 } },
+      })
+    }
 
     try {
       const emailResult = await resend.emails.send({

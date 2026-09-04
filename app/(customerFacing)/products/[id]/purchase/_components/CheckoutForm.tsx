@@ -1,6 +1,6 @@
 "use client"
 
-import React, { FormEvent, useState } from "react"
+import React, { FormEvent, useRef, useState } from "react"
 import {
   Elements,
   LinkAuthenticationElement,
@@ -9,7 +9,7 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
-import { formatCurrency } from "@/lib/formatters"
+import { formatCurrency, formatDiscountCode } from "@/lib/formatters"
 import Image from "next/image"
 import {
   Card,
@@ -21,6 +21,12 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { userOrderExist } from "@/app/actions/order"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { DiscountCodeType } from "@/app/generated/prisma"
+import { getDiscountedAmount } from "@/lib/discountUtils"
+import { createPaymentIntent } from "@/actions/order"
 
 type CheckoutFormProps = {
   product: {
@@ -30,6 +36,7 @@ type CheckoutFormProps = {
     description: string
     imagePath: string
   }
+  discountCode?: { id: string; discountAmount: number; discountType: DiscountCodeType }
   clientSecret: string
 }
 
@@ -37,7 +44,14 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
 )
 
-export const CheckoutForm = ({ product, clientSecret }: CheckoutFormProps) => {
+export const CheckoutForm = ({ product, clientSecret, discountCode }: CheckoutFormProps) => {
+  const amount =
+    discountCode == null
+      ? product.priceInCents
+      : getDiscountedAmount(discountCode, product.priceInCents)
+
+  const isDiscounted = amount !== product.priceInCents
+
   return (
     <div className="max-w-5xl w-full mx-auto space-y-8">
       <div className="flex gap-4 items-center">
@@ -50,8 +64,15 @@ export const CheckoutForm = ({ product, clientSecret }: CheckoutFormProps) => {
           />
         </div>
         <div>
-          <div className="text-lg">
-            {formatCurrency(product.priceInCents / 100)}
+          <div className="flex items-baseline gap-2 text-lg">
+            {isDiscounted && (
+              <span className="line-through text-muted-foreground text-sm">
+                {formatCurrency(product.priceInCents / 100)}
+              </span>
+            )}
+            <span className="font-semibold">
+              {formatCurrency(amount / 100)}
+            </span>
           </div>
           <h1 className="text-2xl font-bold">{product.name}</h1>
           <div className="line-clamp-3 text-muted-foreground">
@@ -59,36 +80,71 @@ export const CheckoutForm = ({ product, clientSecret }: CheckoutFormProps) => {
           </div>
         </div>
       </div>
-      <Elements options={{ clientSecret }} stripe={stripePromise}>
-        <FormInner priceInCents={product.priceInCents} productId={product.id} />
+      <Elements options={{ amount, mode: "payment", currency: "usd" }} stripe={stripePromise}>
+        <FormInner
+          priceInCents={product.priceInCents}
+          productId={product.id}
+          discountCode={discountCode}
+          amount={amount}
+          isDiscounted={isDiscounted}
+        />
       </Elements>
     </div>
   )
 }
 
-function FormInner({ priceInCents,productId }: { priceInCents: number,productId:string }) {
+function FormInner({
+  priceInCents,
+  productId,
+  discountCode,
+  amount,
+  isDiscounted,
+}: {
+  priceInCents: number
+  productId: string
+  discountCode?: { id: string; discountAmount: number; discountType: DiscountCodeType }
+  amount: number
+  isDiscounted: boolean
+}) {
   const stripe = useStripe()
   const elements = useElements()
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>()
   const [email, setEmail] = useState<string>()
+  const discountCodeRef = useRef<HTMLInputElement>(null)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
 
+  const coupon = searchParams.get("coupon")
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
 
-    if (stripe == null || elements == null ||email==null)  return
+    if (stripe == null || elements == null || email == null) return
 
     setIsLoading(true)
-    const orderExists=await userOrderExist(email,productId)
-    if(orderExists){
-        setIsLoading(false)
-        return setErrorMessage("You Have already purshased this product, Try downloading it from the Orders page")
+
+    const formSubmit=await elements.submit()
+    if(formSubmit.error!=null){
+      setErrorMessage(formSubmit.error?.message)
+      setIsLoading(false)
+      return
+    }
+    const payementIntent= await createPaymentIntent(email,productId,discountCode?.id)
+
+    if(payementIntent.error!=null){
+      setErrorMessage(payementIntent.error)
+      setIsLoading(false)
+      return
     }
 
+
+    
     stripe
       .confirmPayment({
         elements,
+        clientSecret:payementIntent.clientSecret,
         confirmParams: {
           return_url: `${process.env.NEXT_PUBLIC_SERVER_URL || window.location.origin}/stripe/purchase-success`,
         },
@@ -116,14 +172,47 @@ function FormInner({ priceInCents,productId }: { priceInCents: number,productId:
               {errorMessage}
             </CardDescription>
           )}
+          {coupon != null && discountCode == null && (
+            <CardDescription className="text-destructive">
+              Invalid discount code
+            </CardDescription>
+          )}
         </CardHeader>
         <CardContent>
           <PaymentElement />
           <div className="mt-4">
             <LinkAuthenticationElement
-  onChange={(e) => setEmail(e.value.email)}
-/>
+              onChange={(e) => setEmail(e.value.email)}
+            />
+          </div>
 
+          <div className="space-y-2 mt-4">
+            <Label htmlFor="discountCode">Coupon</Label>
+            <div className="flex gap-4 items-center">
+              <Input
+                id="discountCode"
+                type="text"
+                name="discountCode"
+                className="max-w-xs w-full"
+                ref={discountCodeRef}
+                defaultValue={coupon || ""}
+              />
+              <Button
+                type="button"
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams)
+                  params.set("coupon", discountCodeRef.current?.value || "")
+                  router.push(`${pathname}?${params.toString()}`)
+                }}
+              >
+                Apply
+              </Button>
+              {discountCode != null && (
+                <div className="text-muted-foreground whitespace-nowrap">
+                  {formatDiscountCode(discountCode)} discount
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
         <CardFooter>
@@ -132,9 +221,18 @@ function FormInner({ priceInCents,productId }: { priceInCents: number,productId:
             size="lg"
             disabled={stripe == null || elements == null || isLoading}
           >
-            {isLoading
-              ? "Purchasing..."
-              : `Purchase - ${formatCurrency(priceInCents / 100)}`}
+            {isLoading ? (
+              "Purchasing..."
+            ) : isDiscounted ? (
+              <div className="flex items-center gap-2">
+                <span className="line-through text-muted-foreground text-sm">
+                  {formatCurrency(priceInCents / 100)}
+                </span>
+                <span>Purchase - {formatCurrency(amount / 100)}</span>
+              </div>
+            ) : (
+              `Purchase - ${formatCurrency(priceInCents / 100)}`
+            )}
           </Button>
         </CardFooter>
       </Card>

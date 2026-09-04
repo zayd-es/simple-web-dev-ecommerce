@@ -18,7 +18,6 @@ import { ActiveToggleDropdownItem, DeleteDropDownItem } from './_components/Prod
 const AdminProductsPage = () => {
   return (
     <div className="space-y-8">
-      {/* Header section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
         <div>
           <PageHeader>Products Catalog</PageHeader>

@@ -14,6 +14,7 @@ export default function AdminLayout({
         <NavLink href="/admin/products">Products</NavLink>
         <NavLink href="/admin/users">Customers</NavLink>
         <NavLink href="/admin/orders">Sales</NavLink>
+        <NavLink href="/admin/discount-codes">Coupon</NavLink>
       </Nav>
       <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">{children}</main>
     </div>

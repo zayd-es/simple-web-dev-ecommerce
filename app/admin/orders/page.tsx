@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { MoreVertical, Package, Mail, DollarSign, ShoppingBag } from "lucide-react"
+import { MoreVertical, Package, Mail, DollarSign, ShoppingBag, Minus } from "lucide-react"
 import { DeleteDropDownItem } from "./_components/OrderActions"
 
 function getOrders() {
@@ -26,6 +26,7 @@ function getOrders() {
       pricePaidInCents: true,
       product: { select: { name: true } },
       user: { select: { email: true } },
+      discountCode:{select:{code:true}}
     },
     orderBy: { createdAt: "desc" },
   })
@@ -74,6 +75,9 @@ async function OrdersTable() {
             <TableHead className="font-bold text-[11px] tracking-wider uppercase text-slate-500 py-4">
               <span className="flex items-center gap-1.5"><DollarSign className="size-3.5" /> Price Paid</span>
             </TableHead>
+            <TableHead className="font-bold text-[11px] tracking-wider uppercase text-slate-500 py-4">
+              <span className="flex items-center gap-1.5"><DollarSign className="size-3.5" /> Coupon</span>
+            </TableHead>
             <TableHead className="w-[60px] text-right font-bold text-[11px] tracking-wider uppercase text-slate-500 py-4">
               Actions
             </TableHead>
@@ -90,6 +94,9 @@ async function OrdersTable() {
               </TableCell>
               <TableCell className="font-semibold text-slate-900 py-4">
                 {formatCurrency(order.pricePaidInCents / 100)}
+              </TableCell>
+              <TableCell>
+                  {order.discountCode==null?<Minus/>:order.discountCode.code}
               </TableCell>
               <TableCell className="text-right py-4">
                 <DropdownMenu>

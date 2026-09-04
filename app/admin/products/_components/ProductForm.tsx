@@ -18,7 +18,6 @@ const ProductForm = ({ product }: { product?: Product | null }) => {
   )
   const [priceInCents, setPriceInCents] = useState<number | undefined>(product?.priceInCents)
   
-  // State د المعاينة الحالية د الصورة
   const [previewImage, setPreviewImage] = useState<string | null>(product?.imagePath ?? null)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
