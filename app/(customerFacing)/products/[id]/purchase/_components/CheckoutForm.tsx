@@ -197,21 +197,43 @@ function FormInner({
                 ref={discountCodeRef}
                 defaultValue={coupon || ""}
               />
-              <Button
-                type="button"
-                onClick={() => {
-                  const params = new URLSearchParams(searchParams)
-                  params.set("coupon", discountCodeRef.current?.value || "")
-                  router.push(`${pathname}?${params.toString()}`)
-                }}
-              >
-                Apply
-              </Button>
-              {discountCode != null && (
-                <div className="text-muted-foreground whitespace-nowrap">
-                  {formatDiscountCode(discountCode)} discount
-                </div>
-              )}
+           <Button
+  type="button"
+  onClick={() => {
+    const params = new URLSearchParams(searchParams)
+    if (!discountCodeRef.current?.value) {
+      params.delete("coupon")
+    } else {
+      params.set("coupon", discountCodeRef.current.value)
+    }
+    router.push(`${pathname}?${params.toString()}`)
+  }}
+>
+  Apply
+</Button>
+
+{discountCode != null && (
+  <Button
+    type="button"
+    variant="destructive"
+    size="sm"
+    onClick={() => {
+      if (discountCodeRef.current) discountCodeRef.current.value = ""
+      const params = new URLSearchParams(searchParams)
+      params.delete("coupon")
+      router.push(`${pathname}?${params.toString()}`)
+    }}
+  >
+    ✕ Remove
+  </Button>
+)}
+
+{discountCode != null && (
+  <div className="text-muted-foreground whitespace-nowrap">
+    {formatDiscountCode(discountCode)} discount
+  </div>
+)}
+           
             </div>
           </div>
         </CardContent>

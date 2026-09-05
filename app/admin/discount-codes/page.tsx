@@ -1,14 +1,13 @@
 import React from 'react'
 import PageHeader from '../_components/PageHeader'
-import { Download, Edit, Globe, Infinity, Minus, MoreVertical, PackageCheck, Plus, ShoppingCart, Tag } from 'lucide-react'
+import { Globe, Infinity, Minus, MoreVertical, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { formatCurrency, formatDateTime, formatDiscountCode, formatNumber } from '@/lib/formatters'
+import { formatDateTime, formatDiscountCode, formatNumber } from '@/lib/formatters'
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
-  DropdownMenuItem, 
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu'
@@ -117,7 +116,7 @@ function DiscountCodesTable({
           {discountCodes.map(discountCode => (
             <TableRow key={discountCode.id} className="transition-colors hover:bg-slate-50/60 border-slate-200/60">
               <TableCell className="py-4">
-                {discountCode.isActive ? (
+                {discountCode.isActive && !isInactive ? (
                   <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     Active
@@ -163,7 +162,6 @@ function DiscountCodesTable({
                       <span className="sr-only">Actions</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  
                   <DropdownMenuContent align="end" className="w-48 rounded-xl p-1.5 border-slate-200 shadow-lg bg-white">
                     {canDeactivate && (
                       <>
