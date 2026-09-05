@@ -60,7 +60,6 @@ const addSchema = z
 
 export async function addDiscountCode(prevState: unknown, formData: FormData) {
   const productIds = formData.getAll("productIds") as string[]
-  
   const allProducts = formData.get("allProducts") === "true"
 
   const result = addSchema.safeParse({
@@ -75,20 +74,31 @@ export async function addDiscountCode(prevState: unknown, formData: FormData) {
 
   const data = result.data
 
-await db.discountCode.create({
-  data: {
-    code: data.code,
-    discountAmount: data.discountAmount,
-    discountType: data.discountType,
-    allProducts: data.allProducts,
-   product:
-      data.productIds && data.productIds.length > 0
-        ? { connect: { id: data.productIds[0] } }
-        : undefined,
-    expiresAt: data.expiresAt,
-    limit: data.limit,
-  },
-})
+  try {
+    await db.discountCode.create({
+      data: {
+        code: data.code,
+        discountAmount: data.discountAmount,
+        discountType: data.discountType,
+        allProducts: data.allProducts,
+        product:
+          data.productIds && data.productIds.length > 0
+            ? { connect: { id: data.productIds[0] } }
+            : undefined,
+        expiresAt: data.expiresAt,
+        limit: data.limit,
+      },
+    })
+  } catch (e: any) {
+    if (e?.code === "P2002") {
+      return {
+        fieldErrors: {
+          code: ["This coupon code already exists. Please use a different code."],
+        },
+      }
+    }
+    throw e
+  }
 
   redirect("/admin/discount-codes")
 }
