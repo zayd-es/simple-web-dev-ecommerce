@@ -15,7 +15,7 @@ const productsData = [
     priceInCents: 5900,
     description: "Launch your SaaS in days, not months. Includes Next.js 15, Stripe billing, Supabase Auth, role-based access control, and a polished dashboard — fully production-ready.",
     imagePath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
-    filePath: "products/sample-file.zip",
+    filePath: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
     isAvailableForPurchase: true,
   },
   {
@@ -23,7 +23,7 @@ const productsData = [
     priceInCents: 3900,
     description: "50+ modern AI-themed React components — chat interfaces, token usage meters, model selectors, and analytics panels. Built with Tailwind CSS and Shadcn UI.",
     imagePath: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?auto=format&fit=crop&w=800&q=80",
-    filePath: "products/sample-file.zip",
+    filePath: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
     isAvailableForPurchase: true,
   },
   {
@@ -31,7 +31,7 @@ const productsData = [
     priceInCents: 2900,
     description: "Complete authentication system with JWT, refresh tokens, OAuth (Google & GitHub), email verification, and 2FA — ready to plug into any Node.js project.",
     imagePath: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80",
-    filePath: "products/sample-file.zip",
+    filePath: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
     isAvailableForPurchase: true,
   },
   {
@@ -39,7 +39,7 @@ const productsData = [
     priceInCents: 1900,
     description: "60+ conversion-optimized sections: hero banners, pricing tables, testimonials, FAQs, and CTAs. Pixel-perfect design, fully responsive and dark-mode ready.",
     imagePath: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=800&q=80",
-    filePath: "products/sample-file.zip",
+    filePath: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
     isAvailableForPurchase: true,
   },
   {
@@ -47,7 +47,7 @@ const productsData = [
     priceInCents: 6900,
     description: "Production-grade microservices architecture with Docker, RabbitMQ message queues, API Gateway, centralized logging, and health monitoring out of the box.",
     imagePath: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
-    filePath: "products/sample-file.zip",
+    filePath: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
     isAvailableForPurchase: true,
   },
   {
@@ -55,7 +55,7 @@ const productsData = [
     priceInCents: 1500,
     description: "Stand out with a sleek, animated developer portfolio. Features Framer Motion transitions, MDX blog, project showcase, dark mode, and perfect Lighthouse scores.",
     imagePath: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=800&q=80",
-    filePath: "products/sample-file.zip",
+    filePath: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
     isAvailableForPurchase: true,
   },
   {
@@ -63,7 +63,7 @@ const productsData = [
     priceInCents: 3500,
     description: "Everything you need to build a stunning online store — product grids, cart drawers, checkout forms, wishlist, filters, and order tracking pages. Tailwind CSS.",
     imagePath: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=800&q=80",
-    filePath: "products/sample-file.zip",
+    filePath: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
     isAvailableForPurchase: true,
   },
   {
@@ -71,7 +71,7 @@ const productsData = [
     priceInCents: 4900,
     description: "Cross-platform mobile boilerplate with Expo Router, NativeWind styling, Zustand state management, and pre-built screens for auth, profile, and settings.",
     imagePath: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=800&q=80",
-    filePath: "products/sample-file.zip",
+    filePath: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
     isAvailableForPurchase: true,
   },
   {
@@ -79,7 +79,7 @@ const productsData = [
     priceInCents: 4500,
     description: "Ready-to-use GitHub Actions workflows for Next.js, Node.js, and Docker projects. Includes automated testing, staging deployments, and production release pipelines.",
     imagePath: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&w=800&q=80",
-    filePath: "products/sample-file.zip",
+    filePath: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
     isAvailableForPurchase: true,
   },
   {
@@ -87,7 +87,7 @@ const productsData = [
     priceInCents: 2500,
     description: "Advanced Prisma ORM setup with multi-tenancy, soft deletes, audit logs, database seeding strategies, and optimized query patterns for large-scale applications.",
     imagePath: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=800&q=80",
-    filePath: "products/sample-file.zip",
+    filePath: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
     isAvailableForPurchase: true,
   },
 ]

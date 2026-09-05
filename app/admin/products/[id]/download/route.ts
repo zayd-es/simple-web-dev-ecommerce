@@ -1,7 +1,6 @@
 import db from "@/db/db"
-import fs from "node:fs/promises"
-import { notFound } from "next/navigation"
-import { NextRequest, NextResponse } from "next/server"
+import { notFound, redirect } from "next/navigation"
+import { NextRequest } from "next/server"
 
 export async function GET(
   req: NextRequest,
@@ -16,14 +15,5 @@ export async function GET(
 
   if (product == null) return notFound()
 
-  const { size } = await fs.stat(product.filePath)
-  const file = await fs.readFile(product.filePath)
-  const extension = product.filePath.split(".").pop()
-
-  return new NextResponse(file, {
-    headers: {  
-      "Content-Disposition": `attachment; filename="${product.name}.${extension}"`,
-      "Content-Length": size.toString(),
-    },
-  })
+  redirect(product.filePath)
 }

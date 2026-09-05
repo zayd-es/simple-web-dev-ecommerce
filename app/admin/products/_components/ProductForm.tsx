@@ -86,56 +86,55 @@ const ProductForm = ({ product }: { product?: Product | null }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="file" className="text-sm font-semibold">File</Label>
-            <Input 
-              type="file" 
-              id="file" 
-              name="file" 
-              className="cursor-pointer file:text-foreground file:font-medium"
-              required={product == null}
-            />
-            {product != null && (
-              <div className="text-xs text-muted-foreground break-all pt-1">
-                {product.filePath}
-              </div>
-            )}
-            {error?.file && (
-              <div className="text-xs font-medium text-destructive pt-1">
-                {error.file[0]}
-              </div>
-            )}
-          </div>
+       <div className="space-y-2">
+  <Label htmlFor="file" className="text-sm font-semibold">File URL</Label>
+  <Input 
+    type="url" 
+    id="file" 
+    name="file" 
+    placeholder="https://drive.google.com/file/d/..."
+    className="focus-visible:ring-2"
+    required={product == null}
+    defaultValue={product?.filePath ?? ""}
+  />
+  {error?.file && (
+    <div className="text-xs font-medium text-destructive pt-1">
+      {error.file[0]}
+    </div>
+  )}
+</div>
 
-          <div className="space-y-2">
-            <Label htmlFor="image" className="text-sm font-semibold">Image</Label>
-            <Input 
-              type="file" 
-              id="image" 
-              name="image" 
-              className="cursor-pointer file:text-foreground file:font-medium"
-              required={product == null}
-              onChange={handleImageChange}
-            />
-            
-            {previewImage != null && (
-              <div className="mt-2 overflow-hidden rounded-lg border border-border w-fit">
-                <Image 
-                  src={previewImage} 
-                  height="200" 
-                  width="200" 
-                  alt="Product Image" 
-                  className="object-cover rounded-lg aspect-square"
-                />
-              </div>
-            )}
+         <div className="space-y-2">
+  <Label htmlFor="image" className="text-sm font-semibold">Image URL</Label>
+  <Input 
+    type="url" 
+    id="image" 
+    name="image" 
+    placeholder="https://images.unsplash.com/..."
+    className="focus-visible:ring-2"
+    required={product == null}
+    defaultValue={product?.imagePath ?? ""}
+    onChange={(e) => setPreviewImage(e.target.value)}
+  />
 
-            {error?.image && (
-              <div className="text-xs font-medium text-destructive pt-1">
-                {error.image[0]}
-              </div>
-            )}
-          </div>
+  {previewImage != null && previewImage.startsWith("http") && (
+    <div className="mt-2 overflow-hidden rounded-lg border border-border w-fit">
+      <Image 
+        src={previewImage} 
+        height="200" 
+        width="200" 
+        alt="Product Image" 
+        className="object-cover rounded-lg aspect-square"
+      />
+    </div>
+  )}
+
+  {error?.image && (
+    <div className="text-xs font-medium text-destructive pt-1">
+      {error.image[0]}
+    </div>
+  )}
+</div>
         </div>
 
         <div className="pt-2">
